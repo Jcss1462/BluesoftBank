@@ -16,7 +16,9 @@ public partial class Transaccione
 
     public DateTime? FechaTransaccion { get; set; }
 
-    public string? CiudadTransaccion { get; set; }
+    public int? IdCiudadTransaccion { get; set; }
+
+    public virtual Ciudade? IdCiudadTransaccionNavigation { get; set; }
 
     [JsonIgnore]
     public virtual Cuenta IdCuentaNavigation { get; set; } = null!;

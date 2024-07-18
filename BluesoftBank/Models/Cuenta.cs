@@ -13,9 +13,11 @@ public partial class Cuenta
 
     public decimal Saldo { get; set; }
 
-    public string? CiudadOrigen { get; set; }
+    public int? IdCiudadOrigen { get; set; }
 
     public DateOnly? FechaApertura { get; set; }
+
+    public virtual Ciudade? IdCiudadOrigenNavigation { get; set; }
 
     public virtual Cliente? IdClienteNavigation { get; set; }
 
