@@ -1,3 +1,4 @@
+using BluesoftBank.Models;
 using BluesoftBank.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,18 @@ public class CuentaController : ControllerBase
         cuentaService = service;
     }
 
-    [HttpGet("{id}")]
-    public IActionResult Get(int id)
+    [HttpGet("GetSaldoActualDeCuenta/{id}")]
+    public IActionResult GetSaldoActualDeCuenta(int id)
     {
         return Ok($"El saldo de la cuenta {id} es: "+cuentaService.ObtenerSaldoDeCuenta(id));
+    }
+
+
+    [HttpGet("getMovimientosResiente/{id}")]
+    public IActionResult getMovimientosResiente(int id)
+    {
+        List<Transaccione> transaccionesRecientes = cuentaService.ObtenerMovimientosRecientes(id);
+        return Ok(transaccionesRecientes);
     }
 
 

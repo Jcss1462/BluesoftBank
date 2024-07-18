@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BluesoftBank.Models;
 
@@ -17,6 +18,7 @@ public partial class Transaccione
 
     public string? CiudadTransaccion { get; set; }
 
+    [JsonIgnore]
     public virtual Cuenta IdCuentaNavigation { get; set; } = null!;
 
     public virtual TipoTransaccione IdTipoTransaccionNavigation { get; set; } = null!;
