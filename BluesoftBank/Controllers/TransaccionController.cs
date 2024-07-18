@@ -43,4 +43,12 @@ public class TransaccionController : ControllerBase
     }
 
 
+    [HttpGet("GetListaClientesRetirosMillonareosForaneo")]
+    public IActionResult GetListaClientesRetirosMillonareosForaneo()
+    {
+        List<RetirosForaneos_DTO> clientesConRetirosMillonariosForaneos = transaccionService.ListaClientesRetirosMillonareosForaneos();
+        return Ok(clientesConRetirosMillonariosForaneos);
+    }
+
+
 }

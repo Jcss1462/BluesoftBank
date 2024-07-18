@@ -1,3 +1,4 @@
+using BluesoftBank.DataRepresentation;
 using BluesoftBank.Dto;
 using BluesoftBank.Models;
 using System.Linq;
@@ -53,11 +54,12 @@ public class TransaccionService : ITransaccionService
         List<NumTransaccionesCliente_DTO> listaTrasacciones= context.Transacciones
                                                             .Where((item => item.FechaTransaccion!.Value.Month == month 
                                                                             && item.FechaTransaccion!.Value.Year == year)
-                                                            ).GroupBy(item=> new { item.IdCuenta, item.IdCuentaNavigation.IdClienteNavigation!.Nombre, item.IdCuentaNavigation.IdClienteNavigation!.Apellido })
+                                                            ).GroupBy(item=> new { item.IdCuenta, item.IdCuentaNavigation.IdCliente, item.IdCuentaNavigation.IdClienteNavigation!.Nombre, item.IdCuentaNavigation.IdClienteNavigation!.Apellido })
                                                             .Select(grupo=>new NumTransaccionesCliente_DTO
                                                             {
                                                                 IdCuenta=grupo.Key.IdCuenta,
-                                                                NombreCliente= grupo.Key.Nombre+" "+ grupo.Key.Apellido,
+                                                                IdCliente= grupo.Key.IdCliente,
+                                                                NombreCliente = grupo.Key.Nombre+" "+ grupo.Key.Apellido,
                                                                 NumeroTransacciones= grupo.Count()
 
                                                             }
@@ -65,6 +67,43 @@ public class TransaccionService : ITransaccionService
                                                             .ToList();
 
         return listaTrasacciones;
+    }
+
+    public List<RetirosForaneos_DTO> ListaClientesRetirosMillonareosForaneos()
+    {
+
+        TipoTransaccionEnum transaccionRetiro= TipoTransaccionEnum.Retiro;
+
+        //obtengo trasacciones de retiro que no se hacen en el lugar de origen de la cuenta
+        List<RetirosForaneos_DTO> listaRetirosForaneos = context.Transacciones
+                                                            .Where(item => (item.IdCiudadTransaccion != item.IdCuentaNavigation.IdCiudadOrigen)
+                                                                           && (item.IdTipoTransaccion == (int) transaccionRetiro)
+                                                            ).GroupBy(item => new RetirosForaneos_DTO {
+                                                                IdCuenta= item.IdCuenta,
+                                                                CiudadRetiroCuenta= item.IdCiudadTransaccionNavigation!.Ciudad,
+                                                                CiudadOrigenCuenta= item.IdCuentaNavigation.IdCiudadOrigenNavigation!.Ciudad,
+                                                                IdCliente= item.IdCuentaNavigation.IdCliente,
+                                                                NombreCliente = item.IdCuentaNavigation.IdClienteNavigation!.Nombre+" "+item.IdCuentaNavigation.IdClienteNavigation!.Apellido,
+                                                            })
+                                                            .Select(grupo => new RetirosForaneos_DTO
+                                                            {
+                                                                IdCuenta = grupo.Key.IdCuenta,
+                                                                IdCliente= grupo.Key.IdCliente,
+                                                                NombreCliente = grupo.Key.NombreCliente,
+                                                                CiudadRetiroCuenta = grupo.Key.CiudadRetiroCuenta,
+                                                                CiudadOrigenCuenta = grupo.Key.CiudadOrigenCuenta,                
+                                                                CantidadTotalRetirada = grupo.Sum(item => item.Monto)
+                                                            }
+                                                            ).OrderByDescending(dto => dto.CantidadTotalRetirada)
+                                                            .ToList();
+
+        //filtro la busqueda anterior para solo obtener las transacciones mayores a 1.000.000
+        List<RetirosForaneos_DTO> listaRetirosForaneosFiltrada = listaRetirosForaneos.
+                                                                Where(item => item.CantidadTotalRetirada > 1000000)
+                                                                .ToList();
+
+
+        return listaRetirosForaneosFiltrada;
     }
 }
 
@@ -76,5 +115,7 @@ public interface ITransaccionService
 
     List<Transaccione> ObtenerEstractoMensual(int cuentaId,int month, int year);
     List<NumTransaccionesCliente_DTO> ListaTransaccionesClientesPorMes(int month, int year);
+
+    List<RetirosForaneos_DTO> ListaClientesRetirosMillonareosForaneos();
 
 }
