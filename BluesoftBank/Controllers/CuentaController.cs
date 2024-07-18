@@ -30,4 +30,12 @@ public class CuentaController : ControllerBase
     }
 
 
+    [HttpGet("getExtractoMensual/{id}/{month}/{year}")]
+    public IActionResult getExtractoMensual(int id, int month, int year)
+    {
+        List<Transaccione> transaccionesRecientes = cuentaService.ObtenerEstractoMensual(id, month, year);
+        return Ok(transaccionesRecientes);
+    }
+
+
 }
