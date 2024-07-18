@@ -11,7 +11,7 @@ public class CuentaService : ICuentaService
         context = dbcontext;
     }
 
-    public void validarCuenta(int cuentaId)
+    public void ValidarCuenta(int cuentaId)
     {
         // Buscar la cuenta en la base de datos por su Id.
         Cuenta? cuenta = context.Cuentas.Where(item => item.IdCuenta == cuentaId).FirstOrDefault();
@@ -26,7 +26,7 @@ public class CuentaService : ICuentaService
     {
 
 
-        validarCuenta(cuentaId);
+        ValidarCuenta(cuentaId);
         // Buscar la cuenta en la base de datos por su Id.
         Cuenta? cuenta = context.Cuentas.Where(item=>item.IdCuenta == cuentaId).FirstOrDefault();
         // Devolver el saldo de la cuenta encontrada.
@@ -38,7 +38,7 @@ public class CuentaService : ICuentaService
 
 public interface ICuentaService
 {
-    void validarCuenta(int cuentaId);
+    void ValidarCuenta(int cuentaId);
 
     decimal ObtenerSaldoDeCuenta(int cuentaId);
 }

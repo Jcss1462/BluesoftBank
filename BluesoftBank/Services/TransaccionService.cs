@@ -1,4 +1,6 @@
+using BluesoftBank.Dto;
 using BluesoftBank.Models;
+using System.Linq;
 
 namespace BluesoftBank.Services;
 
@@ -12,7 +14,7 @@ public class TransaccionService : ITransaccionService
     }
 
 
-    public void validarCuenta(int cuentaId)
+    public void ValidarCuenta(int cuentaId)
     {
         // Buscar la cuenta en la base de datos por su Id.
         Cuenta? cuenta = context.Cuentas.Where(item => item.IdCuenta == cuentaId).FirstOrDefault();
@@ -26,7 +28,7 @@ public class TransaccionService : ITransaccionService
     public List<Transaccione> ObtenerEstractoMensual(int cuentaId, int month, int year)
     {
         // valido que la cuenta solicitada exista
-        validarCuenta(cuentaId);
+        ValidarCuenta(cuentaId);
 
         List<Transaccione> listaTransacciones = context.Transacciones.Where(item => item.IdCuenta == cuentaId && (item.FechaTransaccion!.Value.Month == month &&
         item.FechaTransaccion!.Value.Year == year)).ToList();
@@ -38,7 +40,7 @@ public class TransaccionService : ITransaccionService
     {
 
         // valido que la cuenta solicitada exista
-        validarCuenta(cuentaId);
+        ValidarCuenta(cuentaId);
 
         List<Transaccione> listaTransacciones = context.Transacciones.Where(item => item.IdCuenta == cuentaId && (item.FechaTransaccion >= DateTime.Now.AddDays(-30) &&
         item.FechaTransaccion <= DateTime.Now)).ToList();
@@ -46,14 +48,33 @@ public class TransaccionService : ITransaccionService
         return listaTransacciones;
     }
 
+    public List<NumTransaccionesCliente_DTO> ListaTransaccionesClientesPorMes(int month, int year)
+    {
+        List<NumTransaccionesCliente_DTO> listaTrasacciones= context.Transacciones
+                                                            .Where((item => item.FechaTransaccion!.Value.Month == month 
+                                                                            && item.FechaTransaccion!.Value.Year == year)
+                                                            ).GroupBy(item=> new { item.IdCuenta, item.IdCuentaNavigation.IdClienteNavigation!.Nombre, item.IdCuentaNavigation.IdClienteNavigation!.Apellido })
+                                                            .Select(grupo=>new NumTransaccionesCliente_DTO
+                                                            {
+                                                                IdCuenta=grupo.Key.IdCuenta,
+                                                                NombreCliente= grupo.Key.Nombre+" "+ grupo.Key.Apellido,
+                                                                NumeroTransacciones= grupo.Count()
+
+                                                            }
+                                                            ).OrderByDescending(dto => dto.NumeroTransacciones)
+                                                            .ToList();
+
+        return listaTrasacciones;
+    }
 }
 
 public interface ITransaccionService
 {
-    void validarCuenta(int cuentaId);
+    void ValidarCuenta(int cuentaId);
 
     List<Transaccione> ObtenerMovimientosRecientes(int cuentaId);
 
     List<Transaccione> ObtenerEstractoMensual(int cuentaId,int month, int year);
+    List<NumTransaccionesCliente_DTO> ListaTransaccionesClientesPorMes(int month, int year);
 
 }
