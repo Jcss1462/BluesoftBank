@@ -15,6 +15,7 @@ builder.Services.AddSqlServer<BlueSoftBankContext>(builder.Configuration.GetConn
 
 //creo la inversion de dependencia
 builder.Services.AddScoped<ICuentaService, CuentaService>();
+builder.Services.AddScoped<ITransaccionService, TransaccionService>();
 
 var app = builder.Build();
 

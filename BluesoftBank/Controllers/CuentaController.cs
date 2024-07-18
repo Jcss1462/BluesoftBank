@@ -9,7 +9,7 @@ namespace ApisConPuntoNet.Controllers;
 public class CuentaController : ControllerBase
 {
     ICuentaService cuentaService;
-
+   
     public CuentaController(ICuentaService service)
     {
         cuentaService = service;
@@ -19,22 +19,6 @@ public class CuentaController : ControllerBase
     public IActionResult GetSaldoActualDeCuenta(int id)
     {
         return Ok($"El saldo de la cuenta {id} es: "+cuentaService.ObtenerSaldoDeCuenta(id));
-    }
-
-
-    [HttpGet("getMovimientosResiente/{id}")]
-    public IActionResult getMovimientosResiente(int id)
-    {
-        List<Transaccione> transaccionesRecientes = cuentaService.ObtenerMovimientosRecientes(id);
-        return Ok(transaccionesRecientes);
-    }
-
-
-    [HttpGet("getExtractoMensual/{id}/{month}/{year}")]
-    public IActionResult getExtractoMensual(int id, int month, int year)
-    {
-        List<Transaccione> transaccionesRecientes = cuentaService.ObtenerEstractoMensual(id, month, year);
-        return Ok(transaccionesRecientes);
     }
 
 
